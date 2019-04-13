@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
@@ -33,6 +35,37 @@ public class BookRepositoryTest {
 
     @Test
     public void create() throws Exception{
+        // Test counting books
         assertEquals(Long.valueOf(0), bookRepository.countAll());
+        assertEquals(0, bookRepository.findAll().size());
+
+        // create book
+       Book book = new Book("a title",
+               "a description",
+               12F, "isbn",
+               new Date(), 123,
+               "http://lol",
+               Language.ENGLISH);
+       book = bookRepository.create(book);
+       Long bookId = book.getId();
+
+       // Check created book
+        assertNotNull(bookId);
+
+        // Find created book
+        Book bookFound = bookRepository.find(bookId);
+
+        // Check the found book
+        assertEquals("a title", bookFound.getTitle());
+
+        assertEquals(Long.valueOf(1), bookRepository.countAll());
+        assertEquals(1, bookRepository.findAll().size());
+
+        // Delete the book
+        bookRepository.delete(bookId);
+
+        assertEquals(Long.valueOf(0), bookRepository.countAll());
+        assertEquals(0, bookRepository.findAll().size());
     }
+
 }
